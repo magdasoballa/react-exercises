@@ -21,7 +21,10 @@ export const Header = () => {
           <li>
             <Link to="/invoices">routing</Link>
           </li>
-          <li>x</li>
+          <li>
+            {" "}
+            <Link to="/tests">tests</Link>
+          </li>
           <li>y</li>
           <li>z</li>
         </ul>

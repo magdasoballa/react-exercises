@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import App from "./App";
-import { Styled, Invoice, Invoices } from "./components";
+import { Styled, Invoice, Invoices, Tests } from "./components";
 
 // @ts-ignore
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -24,6 +24,7 @@ root.render(
           />
           <Route path=":invoiceId" element={<Invoice />} />
         </Route>
+        <Route path="tests" element={<Tests />} />
 
         <Route
           path="*"
