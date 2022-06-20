@@ -25,8 +25,10 @@ export const Header = () => {
             {" "}
             <Link to="/tests">tests</Link>
           </li>
-          <li>y</li>
-          <li>z</li>
+          <li>
+            {" "}
+            <Link to="/posts">posts</Link>
+          </li>
         </ul>
         <Outlet />
       </header>
