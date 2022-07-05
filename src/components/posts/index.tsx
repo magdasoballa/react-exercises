@@ -146,7 +146,7 @@ export const Posts = () => {
           })}
         </table>
         <label htmlFor="row-select">Rows per page:</label>
-
+          <div>test</div>
         <select
           name="pets"
           id="row-select"
