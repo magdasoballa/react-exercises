@@ -1,14 +1,26 @@
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { Post } from "../../interfaces";
 import "./posts.scss";
 import CheckIcon from "@mui/icons-material/Check";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import EditIcon from "@mui/icons-material/Edit";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import SearchIcon from "@mui/icons-material/Search";
+import { Post } from "../../interfaces";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import AddIcon from "@mui/icons-material/Add";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 export const Posts = () => {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  const [selectValue, setSelectValue] = useState();
+  const paginationMaxNumber = +posts.length / +rowsPerPage;
+  const arrOfPagination: any = [];
+
   useEffect(() => {
     fetch(`https://jsonplaceholder.typicode.com/posts`)
       .then((response) => response.json())
@@ -37,10 +49,58 @@ export const Posts = () => {
       return [];
     }
   };
+  const chooseRowsPerPage = (event: any) => {
+    setRowsPerPage(event.target.value);
+  };
+
+  const setPagination = (event: any) => {
+    chooseRowsPerPage(event);
+  };
+
+  const showPaginationArray = () => {
+    let num;
+    for (num = 0; num <= paginationMaxNumber; num++) {
+      arrOfPagination.push(num);
+    }
+  };
+
+  const getSpecificPosts = (index: number) => {
+    let slicedPosts: Post[];
+    const startIndex =
+      rowsPerPage === 5 ? index * 5 + 1 : index * rowsPerPage + 1;
+    let endIndex: any;
+    if (index === 0) {
+      endIndex = rowsPerPage;
+    }
+    if (rowsPerPage === 5) {
+      endIndex = index * +rowsPerPage + 5;
+    } else if (rowsPerPage > 5) {
+      endIndex = index * +rowsPerPage + +rowsPerPage;
+    }
+    console.log(startIndex, "startIndex");
+    console.log(endIndex, "endindex");
+    const end = endIndex - 1;
+    slicedPosts = posts.slice(startIndex - 1, end);
+    console.log(slicedPosts);
+    // setPosts(slicedPosts);
+    return undefined;
+  };
+
+  showPaginationArray();
 
   return (
-    <div>
-      <div className=""></div>
+    <div className="table-container">
+      <div className="table-header">
+        <div className="searcher">
+          <input placeholder="Search" />
+          <SearchIcon />
+        </div>
+        <div className="buttons">
+          <div className="add"></div>
+          <div className="create"></div>
+          <div className="export"></div>
+        </div>
+      </div>
       <div className="table">
         <table>
           <tr>
@@ -54,7 +114,7 @@ export const Posts = () => {
             <th>Com.</th>
             <th>Views</th>
           </tr>
-          {posts.map((post) => {
+          {posts.slice(0, rowsPerPage).map((post, ind) => {
             return (
               <tr key={post.id}>
                 <td>
@@ -85,6 +145,26 @@ export const Posts = () => {
             );
           })}
         </table>
+        <label htmlFor="row-select">Rows per page:</label>
+          <div>test</div>
+        <select
+          name="pets"
+          id="row-select"
+          value={selectValue}
+          onChange={setPagination}
+        >
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <div>{paginationMaxNumber}</div>
+        <div>
+          {arrOfPagination.map((el: any, index: number) => (
+            <button onClick={() => getSpecificPosts(index)}>{el}</button>
+          ))}
+        </div>
       </div>
     </div>
   );
