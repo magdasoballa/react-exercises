@@ -1,0 +1,35 @@
+table {
+  background: white;
+  color: black;
+  width: 80vw;
+  margin-top: 20px;
+  text-align: left;
+  border-collapse: collapse;
+
+  tr {
+    border: 1px solid lightgray;
+  }
+  th {
+    font-size: 25px;
+    padding: 10px;
+  }
+  td {
+    font-size: 23px;
+    padding: 10px;
+  }
+  .date {
+    font-style: italic;
+  }
+  .tiles {
+    display: flex;
+
+    .blue-tile {
+      display: flex;
+      svg {
+        fill: cornflowerblue;
+        margin-right: 5px;
+      }
+      color: cornflowerblue;
+    }
+  }
+}
