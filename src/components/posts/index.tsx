@@ -16,8 +16,10 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 export const Posts = () => {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [displayedPosts, setDisplayedPosts] = useState<Post[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
   const [selectValue, setSelectValue] = useState();
+  const [activeIndexOfPagination, setActiveIndexOfPagination] = useState(0)
   const paginationMaxNumber = +posts.length / +rowsPerPage;
   const arrOfPagination: any = [];
 
@@ -27,6 +29,7 @@ export const Posts = () => {
 
       .then((res) => {
         setPosts(completePostsData(res));
+        setDisplayedPosts(completePostsData(res))
       });
   }, []);
 
@@ -59,13 +62,14 @@ export const Posts = () => {
 
   const showPaginationArray = () => {
     let num;
-    for (num = 0; num <= paginationMaxNumber; num++) {
+    for (num = 1; num <= paginationMaxNumber; num++) {
       arrOfPagination.push(num);
     }
   };
 
   const getSpecificPosts = (index: number) => {
     let slicedPosts: Post[];
+    setActiveIndexOfPagination(index)
     const startIndex =
       rowsPerPage === 5 ? index * 5 + 1 : index * rowsPerPage + 1;
     let endIndex: any;
@@ -77,12 +81,8 @@ export const Posts = () => {
     } else if (rowsPerPage > 5) {
       endIndex = index * +rowsPerPage + +rowsPerPage;
     }
-    console.log(startIndex, "startIndex");
-    console.log(endIndex, "endindex");
-    const end = endIndex - 1;
-    slicedPosts = posts.slice(startIndex - 1, end);
-    console.log(slicedPosts);
-    // setPosts(slicedPosts);
+    slicedPosts = posts.slice(startIndex - 1, endIndex);
+    setDisplayedPosts(slicedPosts);
     return undefined;
   };
 
@@ -114,7 +114,7 @@ export const Posts = () => {
             <th>Com.</th>
             <th>Views</th>
           </tr>
-          {posts.slice(0, rowsPerPage).map((post, ind) => {
+          {displayedPosts.slice(0, rowsPerPage).map((post, ind) => {
             return (
               <tr key={post.id}>
                 <td>
@@ -146,7 +146,6 @@ export const Posts = () => {
           })}
         </table>
         <label htmlFor="row-select">Rows per page:</label>
-          <div>test</div>
         <select
           name="pets"
           id="row-select"
@@ -159,13 +158,13 @@ export const Posts = () => {
           <option value="50">50</option>
           <option value="100">100</option>
         </select>
-        <div>{paginationMaxNumber}</div>
         <div>
           {arrOfPagination.map((el: any, index: number) => (
-            <button onClick={() => getSpecificPosts(index)}>{el}</button>
+            <button className={activeIndexOfPagination === index ? "active" : ''} onClick={() => getSpecificPosts(index)}>{el}</button>
           ))}
         </div>
+
       </div>
-    </div>
+    </div >
   );
 };
