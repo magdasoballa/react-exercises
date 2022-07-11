@@ -20,9 +20,15 @@ export const Posts = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
   const [selectValue, setSelectValue] = useState();
   const [activeIndexOfPagination, setActiveIndexOfPagination] = useState(0)
-  const paginationMaxNumber = +posts.length / +rowsPerPage;
-  const arrOfPagination: any = [];
+  const [searcherValue, setSearcherValue] = useState('')
+  const [showResultsFromSearch, setShowResultsFromSearch] = useState(false)
+  let filteredPosts = posts.filter(el => el.title.includes(searcherValue))
 
+  let paginationMaxNumber = +posts.length / +rowsPerPage;
+  let paginationMaxNumberOfSearchResult = Math.ceil(+filteredPosts.length / +rowsPerPage);
+  ;
+  console.log(displayedPosts.length, 'displayedPosts length')
+  const arrOfPagination: any = [];
   useEffect(() => {
     fetch(`https://jsonplaceholder.typicode.com/posts`)
       .then((response) => response.json())
@@ -31,13 +37,17 @@ export const Posts = () => {
         setPosts(completePostsData(res));
         setDisplayedPosts(completePostsData(res))
       });
+
   }, []);
+
 
   const getRandomDate = () => {
     const maxDate = Date.now();
     const timestamp = Math.floor(Math.random() * maxDate);
     const d = new Date(timestamp);
+
     return moment(d).format("DD/M/YYYY");
+
   };
 
   const completePostsData = (postsData: Post[]) => {
@@ -54,15 +64,19 @@ export const Posts = () => {
   };
   const chooseRowsPerPage = (event: any) => {
     setRowsPerPage(event.target.value);
+    setDisplayedPosts(posts.slice(0, event.target.value))
+    setActiveIndexOfPagination(0)
   };
 
   const setPagination = (event: any) => {
+
     chooseRowsPerPage(event);
   };
 
   const showPaginationArray = () => {
     let num;
-    for (num = 1; num <= paginationMaxNumber; num++) {
+    for (num = 1; showResultsFromSearch ? num <= paginationMaxNumberOfSearchResult : num <= paginationMaxNumber; num++) {
+      console.log(paginationMaxNumberOfSearchResult, 'paginationMaxNumberOfSearchResult')
       arrOfPagination.push(num);
     }
   };
@@ -81,20 +95,38 @@ export const Posts = () => {
     } else if (rowsPerPage > 5) {
       endIndex = index * +rowsPerPage + +rowsPerPage;
     }
-    slicedPosts = posts.slice(startIndex - 1, endIndex);
+    slicedPosts = showResultsFromSearch ? filteredPosts.slice(startIndex - 1, endIndex) : posts.slice(startIndex - 1, endIndex);
+    console.log('tuuuuuuu', filteredPosts.slice(startIndex - 1, endIndex))
     setDisplayedPosts(slicedPosts);
+    showPaginationArray()
     return undefined;
   };
 
   showPaginationArray();
 
+  const handleChange = (event: any) => {
+    setSearcherValue(event.target.value);
+  };
+
+  const searchForPost = (event: any) => {
+    event.preventDefault()
+    // filteredPosts = posts.filter(el => el.title.includes(searcherValue))
+    setDisplayedPosts(filteredPosts)
+
+    paginationMaxNumber = Math.ceil(filteredPosts.length / +rowsPerPage)
+    showPaginationArray()
+    setShowResultsFromSearch(true)
+    console.log(filteredPosts.length, 'tuuuuuu search for posts')
+  }
+
   return (
     <div className="table-container">
       <div className="table-header">
-        <div className="searcher">
-          <input placeholder="Search" />
+        <form className="searcher-form" onSubmit={searchForPost}>
+          <input className="searcher-input" placeholder="Search" onChange={handleChange}
+          />
           <SearchIcon />
-        </div>
+        </form>
         <div className="buttons">
           <div className="add"></div>
           <div className="create"></div>
@@ -103,45 +135,49 @@ export const Posts = () => {
       </div>
       <div className="table">
         <table>
-          <tr>
-            <th></th>
-            <th>
-              <input type="checkbox" id="scales" name="scales" />
-            </th>
-            <th>Id</th>
-            <th>Title</th>
-            <th>Published at</th>
-            <th>Com.</th>
-            <th>Views</th>
-          </tr>
-          {displayedPosts.slice(0, rowsPerPage).map((post, ind) => {
+          <thead>
+            <tr>
+              <th></th>
+              <th>
+                <input type="checkbox" id="scales" name="scales" />
+              </th>
+              <th>Id</th>
+              <th>Title</th>
+              <th>Published at</th>
+              <th>Com.</th>
+              <th>Views</th>
+            </tr>
+          </thead>
+          {displayedPosts.slice(0, rowsPerPage).map((post) => {
             return (
-              <tr key={post.id}>
-                <td>
-                  <ArrowForwardIosIcon></ArrowForwardIosIcon>
-                </td>
-                <td>
-                  {" "}
-                  <input type="checkbox" id="scales" name="scales" />
-                </td>
-                <td>{post.id}</td>
-                <td>
-                  {post.title.length > 25
-                    ? `${post.title.slice(0, 20)}...`
-                    : post.title}
-                </td>
-                <td className="date">{post.published}</td>
-                <td>{post.hasComments && <CheckIcon></CheckIcon>}</td>
-                <td>{post?.views}</td>
-                <div className="tiles">
-                  <td className="blue-tile">
-                    <EditIcon></EditIcon> <div>EDIT</div>
+              <tbody>
+                <tr key={post.id}>
+                  <td>
+                    <ArrowForwardIosIcon></ArrowForwardIosIcon>
                   </td>
-                  <td className="blue-tile">
-                    <RemoveRedEyeIcon></RemoveRedEyeIcon> <div>SHOW</div>
+                  <td>
+                    {" "}
+                    <input type="checkbox" id="scales" name="scales" />
                   </td>
-                </div>
-              </tr>
+                  <td>{post.id}</td>
+                  <td>
+                    {post.title.length > 25
+                      ? `${post.title.slice(0, 20)}...`
+                      : post.title}
+                  </td>
+                  <td className="date">{post.published}</td>
+                  <td>{post.hasComments && <CheckIcon></CheckIcon>}</td>
+                  <td>{post?.views}</td>
+                  <td className="tiles">
+                    <div className="blue-tile">
+                      <EditIcon></EditIcon> <div>EDIT</div>
+                    </div>
+                    <div className="blue-tile">
+                      <RemoveRedEyeIcon></RemoveRedEyeIcon> <div>SHOW</div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
             );
           })}
         </table>
@@ -159,8 +195,9 @@ export const Posts = () => {
           <option value="100">100</option>
         </select>
         <div>
+          {filteredPosts.length}
           {arrOfPagination.map((el: any, index: number) => (
-            <button className={activeIndexOfPagination === index ? "active" : ''} onClick={() => getSpecificPosts(index)}>{el}</button>
+            <button key={index} className={activeIndexOfPagination === index ? "active" : ''} onClick={() => getSpecificPosts(index)}>{el}</button>
           ))}
         </div>
 
